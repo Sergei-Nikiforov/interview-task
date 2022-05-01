@@ -19,7 +19,7 @@ router.get('/files', async(req, res) => {
             skip: parseInt(req.query.skip) || 0,
             sort
         }
-        const files = await File.find({}, null, options);
+        const files = await File.find({isDeleted: false}, null, options);
         res.send(files);
     } catch (e) {
         res.status(500).send(e);
@@ -49,7 +49,7 @@ router.post('/add', upload.single('file'), async (req, res) => {
     await file.save();
     await add_log(file.id);
     
-    res.status(201).send(JSON.stringify(file));
+    res.status(201).send(file);
 }, (error, req, res, next) => {
     res.status(500).send({error: error.message});
 })
@@ -66,7 +66,7 @@ router.patch('/delete/:id', async(req, res) => {
         await file.save();
         await add_log(file.id, 'deleted');
 
-        res.send({isDeleted: file.isDeleted});
+        res.send('File marked for deletion!');
 
     } catch (e) {
         res.status(500).send(e);
